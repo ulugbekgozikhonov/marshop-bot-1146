@@ -67,11 +67,15 @@ class DatabaseManager():
             print(e)
             return False
         
-def delete_user_by_chat_id(chat_id: int):
-    con = sqlite3.connect("marshop.db")
-    cur = con.cursor()
+
+# cur.execute("ALTER TABLE products ADD status BOOLEAN DEFAULT(FALSE)")
+# con.commit()
+        
+# def delete_user_by_chat_id(chat_id: int):
+#     con = sqlite3.connect("marshop.db")
+#     cur = con.cursor()
     
-    cur.execute("DELETE FROM users WHERE chat_id=?",(chat_id,))
-    con.commit()
+#     cur.execute("DELETE FROM users WHERE chat_id=?",(chat_id,))
+#     con.commit()
 
 # delete_user_by_chat_id(909437832)

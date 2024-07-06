@@ -62,7 +62,15 @@ async def my_product_handler(message:types.Message):
 
 @dp.message_handler(text="Show Products")
 async def my_product_handler(message:types.Message):
-    pass
+    chat_id = message.chat.id
+    user = await database.get_user_by_chat_id(chat_id)
+    if user:
+        products = await database.get_all_products_by_user_id(user[0])
+        for product in products:
+            await message.answer_photo(product[2],
+            caption=f"Name: {product[1]}\nPrice: {product[3]}\nCount: {product[5]}\nDescription: {product[4]}")
+    else:
+        await message.answer("You have to compilte register")
 
 
 @dp.message_handler(text="Add Product")
