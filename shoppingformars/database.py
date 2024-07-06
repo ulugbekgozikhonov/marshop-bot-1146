@@ -67,8 +67,8 @@ class DatabaseManager():
             print(e)
             return False
         
-
-# cur.execute("ALTER TABLE products ADD status BOOLEAN DEFAULT(FALSE)")
+# cur.execute("UPDATE products set status = ? Where id = ?",(False,1))
+# # cur.execute("ALTER TABLE products ADD status BOOLEAN DEFAULT(FALSE)")
 # con.commit()
         
 # def delete_user_by_chat_id(chat_id: int):

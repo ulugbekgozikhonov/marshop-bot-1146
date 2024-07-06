@@ -5,6 +5,7 @@ import logging
 
 from state import *
 from default_btn import *
+from inlayn_btn import *
 from database import DatabaseManager
 
 logging.basicConfig(level=logging.INFO)
@@ -67,8 +68,14 @@ async def my_product_handler(message:types.Message):
     if user:
         products = await database.get_all_products_by_user_id(user[0])
         for product in products:
-            await message.answer_photo(product[2],
-            caption=f"Name: {product[1]}\nPrice: {product[3]}\nCount: {product[5]}\nDescription: {product[4]}")
+            if product[-1]:
+                await message.answer_photo(product[2],
+                caption=f"Name: {product[1]}\nPrice: {product[3]}\nCount: {product[5]}\nDescription: {product[4]}",
+                reply_markup=show_prodact_btns("Remove to shop"))
+            else :
+                await message.answer_photo(product[2],
+                caption=f"Name: {product[1]}\nPrice: {product[3]}\nCount: {product[5]}\nDescription: {product[4]}",
+                reply_markup=show_prodact_btns("Add to shop"))
     else:
         await message.answer("You have to compilte register")
 
@@ -118,6 +125,9 @@ async def add_product_name_handler(message:types.Message,state:FSMContext):
     await database.add_product(data)
     await message.answer("Successfully added")
     await state.finish()
+    
+    
+    
     
     
     
