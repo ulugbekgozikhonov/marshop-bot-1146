@@ -25,8 +25,11 @@ shop_menu = ReplyKeyboardMarkup(
 my_products = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton("Show Products"),
-            KeyboardButton("Add Product"),
+            KeyboardButton("🛒Show Products"),
+            KeyboardButton("➕Add Product"),
+        ],
+        [
+            KeyboardButton("⬅️Back")
         ]
     ],resize_keyboard=True
 )

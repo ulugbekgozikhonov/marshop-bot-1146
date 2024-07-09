@@ -59,15 +59,21 @@ class DatabaseManager():
         except Exception as ex:
             print(ex)
             return False
-    async def get_all_products_by_user_id(self,user_id: int):
+    async def get_all_products_by_chat_id(self,chat_id: int):
         try:
-            products = self.__cur.execute("SELECT * FROM products WHERE user_id=?",(user_id,)).fetchall()
+            products = self.__cur.execute("SELECT * FROM products JOIN users ON products.user_id = users.id WHERE users.chat_id=?",(chat_id,)).fetchall()
             return products
         except Exception as e:
             print(e)
             return False
         
-# cur.execute("UPDATE products set status = ? Where id = ?",(False,1))
+        
+
+    # async def add_to_shop_product(self, chat_id : int):
+    #     try:
+    #         self.__cur.execute("""UPDATE products SET status = ? """, (True , chat_id))
+            
+# cur.execute("UPDATE products set status = ? Where  id= ?",(True,12))
 # # cur.execute("ALTER TABLE products ADD status BOOLEAN DEFAULT(FALSE)")
 # con.commit()
         

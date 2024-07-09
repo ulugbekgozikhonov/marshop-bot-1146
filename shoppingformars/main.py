@@ -61,26 +61,31 @@ async def phone_number_handler(message:types.Message,state:FSMContext):
 async def my_product_handler(message:types.Message):
     await message.answer("Choice Command",reply_markup=my_products)
 
-@dp.message_handler(text="Show Products")
+@dp.message_handler(text="🛒Show Products")
 async def my_product_handler(message:types.Message):
     chat_id = message.chat.id
-    user = await database.get_user_by_chat_id(chat_id)
-    if user:
-        products = await database.get_all_products_by_user_id(user[0])
-        for product in products:
-            if product[-1]:
-                await message.answer_photo(product[2],
-                caption=f"Name: {product[1]}\nPrice: {product[3]}\nCount: {product[5]}\nDescription: {product[4]}",
-                reply_markup=show_prodact_btns("Remove to shop"))
-            else :
-                await message.answer_photo(product[2],
-                caption=f"Name: {product[1]}\nPrice: {product[3]}\nCount: {product[5]}\nDescription: {product[4]}",
-                reply_markup=show_prodact_btns("Add to shop"))
-    else:
-        await message.answer("You have to compilte register")
+    products = await database.get_all_products_by_chat_id(chat_id=chat_id)
+    for product in products:
+        if product[-1]:
+            await message.answer_photo(product[2],
+            caption=f"Id: {product[0]}\nName: {product[1]}\nPrice: {product[3]} so'm\nCount: {product[5]}\nDescription: {product[4]}",
+            reply_markup=show_prodact_btns("➕Add to shop"))
+        else :
+            await message.answer_photo(product[2],
+            caption=f"Id: {product[0]}\nName: {product[1]}\nPrice: {product[3]} so'm\nCount: {product[5]}\nDescription: {product[4]}",
+            reply_markup=show_prodact_btns("➖Remove to shop"))
 
+@dp.callback_query_handler(text="ad_or_del_shop")
+async def add_shop_handler(call:types.CallbackQuery):
+    caption = call.message.caption
+    print(caption.split('\n')[0])
+    
+    
+@dp.message_handler(text="⬅️Back")
+async def add_product_handler(message:types.Message):
+    await message.answer("Main Menu",reply_markup=shop_menu)
 
-@dp.message_handler(text="Add Product")
+@dp.message_handler(text="➕Add Product")
 async def add_product_handler(message:types.Message):
     await message.answer("Enter product name: ")
     await AddProductState.name.set()
