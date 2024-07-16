@@ -66,7 +66,28 @@ class DatabaseManager():
         except Exception as e:
             print(e)
             return False
+    async def update_product_status(self,id,status):
+        try:
+            self.__cur.execute("UPDATE products SET status=? WHERE id=?",(status,id))
+            self.__con.commit()
+            return True
+        except Exception as ex:
+            print(ex)
+            return False
         
+    async def marsshop_prodacts(self,status,limit,offset):
+        try:
+            return self.__cur.execute("SELECT * FROM products WHERE status = ? LIMIT ? OFFSET ? ",(status,limit,offset)).fetchall()
+        except Exception as ex:
+            print(ex)
+            return False
+    
+    async def get_product_count_by_status(self,status):
+        try:
+            return self.__cur.execute("SELECT COUNT(id) FROM products WHERE status = ?",(status,)).fetchone()
+        except Exception as ex:
+            print(ex)
+            return False
         
 
     # async def add_to_shop_product(self, chat_id : int):
@@ -76,6 +97,7 @@ class DatabaseManager():
 # cur.execute("UPDATE products set status = ? Where  id= ?",(True,12))
 # # cur.execute("ALTER TABLE products ADD status BOOLEAN DEFAULT(FALSE)")
 # con.commit()
+# print(cur.execute("SELECT COUNT(id) FROM products WHERE status = ?",(True,)).fetchone())
         
 # def delete_user_by_chat_id(chat_id: int):
 #     con = sqlite3.connect("marshop.db")

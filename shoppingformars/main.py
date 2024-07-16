@@ -10,7 +10,8 @@ from database import DatabaseManager
 
 logging.basicConfig(level=logging.INFO)
 
-BOT_TOKEN = "6878062588:AAHxrmFut6L4UeUziNqbQgkg1BQO1a_0EK4"
+BOT_TOKEN = "6878062588:AAGqQVplR3FF2S4jt2q69bG79Wlwre0cAKk"
+
 
 bot = Bot(token=BOT_TOKEN)
 storage = MemoryStorage()
@@ -25,7 +26,6 @@ async def on_startup(dp):
 async def on_shutdown(dp):
     await bot.send_message(chat_id=909437832,text="Bot has stopped")
 
-
 @dp.message_handler(commands="start")
 async def start_handler(message:types.Message):
     chat_id = message.chat.id
@@ -36,7 +36,6 @@ async def start_handler(message:types.Message):
         await message.answer("Welcome to mars shop")
         await message.answer("You can register for use this bot\nEnter full name: ")
         await RegisterState.full_name.set()
-    
 
 @dp.message_handler(state=RegisterState.full_name)
 async def full_name_handler(message:types.Message,state:FSMContext):
@@ -60,26 +59,56 @@ async def phone_number_handler(message:types.Message,state:FSMContext):
 @dp.message_handler(text="My Products")
 async def my_product_handler(message:types.Message):
     await message.answer("Choice Command",reply_markup=my_products)
+    
+@dp.message_handler(text="MARS Shop")
+async def marsshop_hendler(message:types.Message):
+    start = 0
+    total = await database.get_product_count_by_status(True)
+    total = total[0]
+    end = 4 if total>4 else total
+    products=await database.marsshop_prodacts(True,end,start)
+    number_btns = await mars_shop_btn(end-start)
+    print(products)
+    text = f"""Natijalar {start+1}-{end} {total} dan\n"""
+    for i,product in enumerate(products):
+        text+=f"{i+1}. {product[1]}-{product[4]}\n"
+    print(text)
+    await message.answer(text,reply_markup=number_btns)
+    
+    # for product in products:
+    #     await message.answer_photo(product[2],
+    #     caption=f"Product ID {product[0]}\n:Name: {product[1]}\nPrice: {product[3]} so'm\nCount: {product[5]}\nDescription: {product[4]}",
+    #     reply_markup=buy_product)
 
 @dp.message_handler(text="🛒Show Products")
 async def my_product_handler(message:types.Message):
     chat_id = message.chat.id
     products = await database.get_all_products_by_chat_id(chat_id=chat_id)
     for product in products:
-        if product[-1]:
-            await message.answer_photo(product[2],
-            caption=f"Id: {product[0]}\nName: {product[1]}\nPrice: {product[3]} so'm\nCount: {product[5]}\nDescription: {product[4]}",
-            reply_markup=show_prodact_btns("➕Add to shop"))
-        else :
-            await message.answer_photo(product[2],
-            caption=f"Id: {product[0]}\nName: {product[1]}\nPrice: {product[3]} so'm\nCount: {product[5]}\nDescription: {product[4]}",
-            reply_markup=show_prodact_btns("➖Remove to shop"))
+        await message.answer_photo(product[2],
+        caption=f"Product ID {product[0]}\n:Name: {product[1]}\nPrice: {product[3]} so'm\nCount: {product[5]}\nDescription: {product[4]}",
+        reply_markup=show_prodact_btns(product[-1]))
 
 @dp.callback_query_handler(text="ad_or_del_shop")
 async def add_shop_handler(call:types.CallbackQuery):
     caption = call.message.caption
-    print(caption.split('\n')[0])
+    line_id = caption.split('\n')[0]    
+    id = line_id.split(" ")[-1]
     
+    add_or_rem = call.message.reply_markup.inline_keyboard[-1][0].text
+    if add_or_rem == "➖Remove to shop":
+        if  await database.update_product_status(id,False):
+            await call.message.edit_reply_markup(reply_markup=show_prodact_btns(False))
+            await call.answer("Product is removed from MARSHOP ")
+        else:
+            await call.message.answer("Error Remove Product")
+    else:
+        if await database.update_product_status(id,True):
+            await call.message.edit_reply_markup(reply_markup=show_prodact_btns(True))
+            await call.answer("Product is added from MARSHOP ")
+        else:
+            await call.message.answer("Error Add Product")
+    await call.answer()
     
 @dp.message_handler(text="⬅️Back")
 async def add_product_handler(message:types.Message):
@@ -129,13 +158,7 @@ async def add_product_name_handler(message:types.Message,state:FSMContext):
     data["user_id"] = user[0]
     await database.add_product(data)
     await message.answer("Successfully added")
-    await state.finish()
-    
-    
+    await state.finish() 
     
 if __name__ == "__main__":
     executor.start_polling(dp,skip_updates=True,on_startup=on_startup,on_shutdown=on_shutdown)
-
-
-
-# /Ismoil
