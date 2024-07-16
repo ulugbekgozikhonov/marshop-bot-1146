@@ -12,7 +12,6 @@ logging.basicConfig(level=logging.INFO)
 
 BOT_TOKEN = "6878062588:AAGqQVplR3FF2S4jt2q69bG79Wlwre0cAKk"
 
-
 bot = Bot(token=BOT_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot=bot,storage=storage)
@@ -36,6 +35,11 @@ async def start_handler(message:types.Message):
         await message.answer("Welcome to mars shop")
         await message.answer("You can register for use this bot\nEnter full name: ")
         await RegisterState.full_name.set()
+
+@dp.message_handler(commands="help")
+async def start_handler(message:types.Message):
+    await message.answer("Bu help buyrugi")
+
 
 @dp.message_handler(state=RegisterState.full_name)
 async def full_name_handler(message:types.Message,state:FSMContext):
